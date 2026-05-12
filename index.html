@@ -40,7 +40,7 @@
             <p class="text-gray-500 text-sm font-medium">「地域の力で、最高の学び舎を子どもたちへ」</p>
         </header>
 
-        <!-- メイン数値カード -->
+        <!-- 数値カード -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
             <div class="stat-card bg-white p-6 md:p-8 rounded-3xl shadow-sm border-b-8 border-blue-600 text-center animate-fade-in" style="animation-delay: 0.1s;">
                 <div class="text-3xl mb-2 md:mb-3">👥</div>
@@ -64,7 +64,7 @@
             </div>
         </div>
 
-        <!-- 進捗 -->
+        <!-- 進捗状況 -->
         <div class="bg-white rounded-3xl shadow-sm p-6 md:p-10 mb-10 border border-gray-100 animate-fade-in" style="animation-delay: 0.4s;">
             <h2 class="text-lg md:text-xl font-black mb-8 flex items-center text-slate-700">
                 <span class="w-1.5 h-6 bg-blue-600 rounded-full mr-3 shadow-sm"></span>
@@ -127,12 +127,12 @@
             </button>
         </section>
 
-        <!-- 閲覧用メッセージ -->
+        <!-- 閲覧者メッセージ -->
         <div class="viewer-msg text-center p-8 border-2 border-dashed border-slate-200 rounded-[2.5rem] bg-slate-50/50 mb-10">
             <p class="text-slate-400 text-xs font-bold tracking-tighter">📡 集計本部の更新をリアルタイムで待機中...</p>
         </div>
 
-        <!-- モード切替 -->
+        <!-- フッター -->
         <footer class="mt-12 mb-12 text-center px-4">
             <p class="text-slate-300 text-[9px] font-black uppercase tracking-[0.2em] mb-6 italic">© 2026 HIKITSU ELEMENTARY SCHOOL PTA</p>
             <div class="inline-flex bg-white p-1 rounded-2xl shadow-sm border border-slate-100 w-full max-w-sm overflow-hidden">
@@ -152,49 +152,57 @@
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // --- Config & Firebase ---
-        let firebaseConfig = {};
-        try {
-            if (typeof __firebase_config !== 'undefined') firebaseConfig = JSON.parse(__firebase_config);
-        } catch (e) { console.error("Config error", e); }
-        
+        // --- Firebase設定 ---
+        const firebaseConfig = JSON.parse(__firebase_config);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'hikitsu-env-2026';
-        const GOALS = { trucks: 15, cutters: 20 };
         const DOC_PATH = ["artifacts", appId, "public", "data", "statistics", "summary"];
+        const GOALS = { trucks: 15, cutters: 20 };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- UI & State ---
+        // --- UI要素 ---
         const ui = {
-            badge: document.getElementById('badge'),
-            valPeople: document.getElementById('val-people'),
-            valTrucks: document.getElementById('val-trucks'),
-            valCutters: document.getElementById('val-cutters'),
-            txtTruckPct: document.getElementById('txt-truck-pct'),
-            txtCutterPct: document.getElementById('txt-cutter-pct'),
-            barTruck: document.getElementById('bar-truck'),
-            barCutter: document.getElementById('bar-cutter'),
-            inPeople: document.getElementById('in-people'),
-            inTrucks: document.getElementById('in-trucks'),
-            inCutters: document.getElementById('in-cutters'),
-            btnSave: document.getElementById('btn-save'),
-            btnText: document.getElementById('btn-text'),
-            syncText: document.getElementById('sync-text'),
-            syncIcon: document.getElementById('sync-icon'),
-            uiMsg: document.getElementById('ui-message'),
-            msgContent: document.getElementById('msg-content')
+            vPeople: document.getElementById('val-people'),
+            vTrucks: document.getElementById('val-trucks'),
+            vCutters: document.getElementById('val-cutters'),
+            tBar: document.getElementById('bar-truck'),
+            cBar: document.getElementById('bar-cutter'),
+            tPct: document.getElementById('txt-truck-pct'),
+            cPct: document.getElementById('txt-cutter-pct'),
+            inP: document.getElementById('in-people'),
+            inT: document.getElementById('in-trucks'),
+            inC: document.getElementById('in-cutters'),
+            btn: document.getElementById('btn-save'),
+            btnT: document.getElementById('btn-text'),
+            sTxt: document.getElementById('sync-text'),
+            sIcon: document.getElementById('sync-icon'),
+            msg: document.getElementById('ui-message'),
+            mCon: document.getElementById('msg-content')
         };
 
-        function showMessage(text) {
-            if (!ui.msgContent) return;
-            ui.msgContent.innerText = text;
-            ui.uiMsg.style.display = 'flex';
-            setTimeout(() => { ui.uiMsg.style.display = 'none'; }, 4000);
+        function showMsg(text) {
+            ui.mCon.innerText = text;
+            ui.msg.style.display = 'flex';
+            setTimeout(() => { ui.msg.style.display = 'none'; }, 5000);
         }
 
-        // --- Controller ---
+        // --- セッション管理 ---
+        const startSession = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (e) {
+                console.error("Auth Init Error", e);
+                showMsg("ログインエラー: " + e.message);
+            }
+        };
+
+        // --- モード切替 ---
         window.changeMode = (mode) => {
             window.location.hash = (mode === 'admin') ? 'admin' : '';
             if (mode !== 'admin') history.replaceState(null, null, ' ');
@@ -204,127 +212,108 @@
         function applyMode() {
             const isAdmin = window.location.hash === '#admin';
             document.body.classList.toggle('is-admin', isAdmin);
+            const badge = document.getElementById('badge');
+            const lA = document.getElementById('link-admin');
+            const lV = document.getElementById('link-viewer');
             
-            const linkAdmin = document.getElementById('link-admin');
-            const linkViewer = document.getElementById('link-viewer');
-
             if (isAdmin) {
-                if (ui.badge) {
-                    ui.badge.innerText = "ADMIN MANAGEMENT CONSOLE";
-                    ui.badge.className = "inline-block px-4 py-1 rounded-full bg-slate-800 text-blue-400 text-[10px] font-bold mb-3 tracking-widest uppercase shadow-lg";
-                }
-                linkAdmin.className = "flex-1 px-4 py-3 rounded-xl text-[10px] font-black bg-slate-900 text-white shadow-md";
-                linkViewer.className = "flex-1 px-4 py-3 rounded-xl text-[10px] font-black text-slate-400";
+                badge.innerText = "ADMIN MANAGEMENT CONSOLE";
+                badge.className = "inline-block px-4 py-1 rounded-full bg-slate-800 text-blue-400 text-[10px] font-bold mb-3 tracking-widest uppercase shadow-lg";
+                lA.className = "flex-1 px-4 py-3 rounded-xl text-[10px] font-black bg-slate-900 text-white shadow-md";
+                lV.className = "flex-1 px-4 py-3 rounded-xl text-[10px] font-black text-slate-400";
             } else {
-                if (ui.badge) {
-                    ui.badge.innerText = "LIVE DATA PROCESSING";
-                    ui.badge.className = "inline-block px-4 py-1 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold mb-3 tracking-widest uppercase shadow-sm";
-                }
-                linkViewer.className = "flex-1 px-4 py-3 rounded-xl text-[10px] font-black bg-blue-600 text-white shadow-md";
-                linkAdmin.className = "flex-1 px-4 py-3 rounded-xl text-[10px] font-black text-slate-400";
+                badge.innerText = "LIVE DATA PROCESSING";
+                badge.className = "inline-block px-4 py-1 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold mb-3 tracking-widest uppercase shadow-sm";
+                lV.className = "flex-1 px-4 py-3 rounded-xl text-[10px] font-black bg-blue-600 text-white shadow-md";
+                lA.className = "flex-1 px-4 py-3 rounded-xl text-[10px] font-black text-slate-400";
             }
         }
 
         window.addEventListener('hashchange', applyMode);
         applyMode();
 
-        // --- Data & Sync ---
-        const startSession = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (e) { console.error("Auth init error", e); }
-        };
-
+        // --- データ同期 ---
         onAuthStateChanged(auth, (user) => {
             if (!user) {
-                ui.syncText.innerText = "AUTHENTICATING...";
+                ui.sTxt.innerText = "WAITING FOR AUTH...";
                 return;
             }
             
-            ui.syncText.innerText = "CLOUD SYNCING...";
-            ui.syncIcon.className = "w-1.5 h-1.5 bg-green-500 rounded-full mr-2 animate-pulse";
+            ui.sTxt.innerText = "CLOUD CONNECTED";
+            ui.sIcon.className = "w-1.5 h-1.5 bg-green-500 rounded-full mr-2 animate-pulse";
 
             onSnapshot(doc(db, ...DOC_PATH), (snap) => {
                 if (snap.exists()) {
                     const data = snap.data();
-                    renderData(data);
-                    // 入力欄にフォーカスがないときのみ同期
-                    if (document.activeElement.tagName !== 'INPUT') {
-                        if (ui.inPeople) ui.inPeople.value = data.people || 0;
-                        if (ui.inTrucks) ui.inTrucks.value = data.trucks || 0;
-                        if (ui.inCutters) ui.inCutters.value = data.cutters || 0;
+                    // 表示更新
+                    const p = data.people || 0;
+                    const t = data.trucks || 0;
+                    const c = data.cutters || 0;
+                    ui.vPeople.innerText = p.toLocaleString();
+                    ui.vTrucks.innerText = t.toLocaleString();
+                    ui.vCutters.innerText = c.toLocaleString();
+                    
+                    const tR = Math.min(Math.round((t / GOALS.trucks) * 100), 100);
+                    const cR = Math.min(Math.round((c / GOALS.cutters) * 100), 100);
+                    ui.tPct.innerText = tR + '%';
+                    ui.cPct.innerText = cR + '%';
+                    ui.tBar.style.width = tR + '%';
+                    ui.cBar.style.width = cR + '%';
+
+                    // 入力欄同期（編集中でない場合）
+                    if (document.activeElement !== ui.inP && document.activeElement !== ui.inT && document.activeElement !== ui.inC) {
+                        ui.inP.value = p;
+                        ui.inT.value = t;
+                        ui.inC.value = c;
                     }
-                    ui.syncText.innerText = "ONLINE / UPDATED";
-                    ui.syncIcon.className = "w-1.5 h-1.5 bg-green-500 rounded-full mr-2";
                 }
             }, (err) => {
-                ui.syncText.innerText = "SYNC ERROR";
-                ui.syncIcon.className = "w-1.5 h-1.5 bg-red-500 rounded-full mr-2";
+                console.error("Sync Error", err);
+                showMsg("同期エラー: " + err.message);
             });
         });
 
-        function renderData(data) {
-            const p = data.people || 0;
-            const t = data.trucks || 0;
-            const c = data.cutters || 0;
-
-            if (ui.valPeople) ui.valPeople.innerText = p.toLocaleString();
-            if (ui.valTrucks) ui.valTrucks.innerText = t.toLocaleString();
-            if (ui.valCutters) ui.valCutters.innerText = c.toLocaleString();
-
-            const tRate = Math.min(Math.round((t / GOALS.trucks) * 100), 100);
-            const cRate = Math.min(Math.round((c / GOALS.cutters) * 100), 100);
-
-            if (ui.txtTruckPct) ui.txtTruckPct.innerText = tRate + '%';
-            if (ui.txtCutterPct) ui.txtCutterPct.innerText = cRate + '%';
-            if (ui.barTruck) ui.barTruck.style.width = tRate + '%';
-            if (ui.barCutter) ui.barCutter.style.width = cRate + '%';
-        }
-
-        // --- Save Action ---
-        if (ui.btnSave) {
-            ui.btnSave.onclick = async () => {
-                // 認証チェック
+        // --- 保存処理 ---
+        ui.btn.onclick = async () => {
+            // 保存前に認証を確実にチェック/再実行
+            if (!auth.currentUser) {
+                ui.btnT.innerText = "認証中...";
+                await startSession();
                 if (!auth.currentUser) {
-                    showMessage("認証待機中です。数秒待ってから再度お試しください。");
-                    await startSession(); // 再試行
+                    showMsg("認証に失敗しました。ネットワークを確認してください。");
+                    ui.btnT.innerText = "クラウドへデータを反映する";
                     return;
                 }
+            }
+            
+            ui.btn.disabled = true;
+            ui.btnT.innerText = "送信中...";
+
+            try {
+                const data = {
+                    people: parseInt(ui.inP.value) || 0,
+                    trucks: parseInt(ui.inT.value) || 0,
+                    cutters: parseInt(ui.inC.value) || 0,
+                    updatedAt: new Date()
+                };
+
+                await setDoc(doc(db, ...DOC_PATH), data, { merge: true });
                 
-                ui.btnSave.disabled = true;
-                const originalBtnText = ui.btnText.innerText;
-                ui.btnText.innerText = "クラウドへ送信中...";
+                ui.btnT.innerText = "反映完了！";
+                showMsg("クラウドへデータを反映しました。");
+                setTimeout(() => {
+                    ui.btnT.innerText = "クラウドへデータを反映する";
+                    ui.btn.disabled = false;
+                }, 2000);
+            } catch (err) {
+                console.error("Save Error", err);
+                showMsg("反映エラー: " + err.message);
+                ui.btnT.innerText = "クラウドへデータを反映する";
+                ui.btn.disabled = false;
+            }
+        };
 
-                try {
-                    // 最新の入力を直接取得
-                    const payload = {
-                        people: parseInt(document.getElementById('in-people').value) || 0,
-                        trucks: parseInt(document.getElementById('in-trucks').value) || 0,
-                        cutters: parseInt(document.getElementById('in-cutters').value) || 0,
-                        lastUpdate: new Date()
-                    };
-
-                    await setDoc(doc(db, ...DOC_PATH), payload, { merge: true });
-                    
-                    ui.btnText.innerText = "更新完了！";
-                    showMessage("集計データを更新し、全員の画面へ反映しました。");
-                    setTimeout(() => {
-                        ui.btnText.innerText = originalBtnText;
-                        ui.btnSave.disabled = false;
-                    }, 2000);
-                } catch (err) {
-                    console.error("Save error", err);
-                    showMessage("保存に失敗しました。権限または通信環境を確認してください。");
-                    ui.btnText.innerText = originalBtnText;
-                    ui.btnSave.disabled = false;
-                }
-            };
-        }
-
+        // 初期化実行
         startSession();
     </script>
 </body>
