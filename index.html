@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>引津小・美化作業集計速報 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap');
+        body { font-family: 'Noto Sans JP', sans-serif; background-color: #f8fafc; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+        .stat-card { transition: all 0.3s ease; }
+        .gradient-text { background: linear-gradient(135deg, #1e40af, #047857); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* 管理モード表示切り替え */
+        .admin-section { display: none; }
+        body.is-admin .admin-section { display: block; }
+        body.is-admin .viewer-msg { display: none; }
+        body.is-admin { background-color: #f1f5f9; }
+
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        
+        #ui-message { display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 100; min-width: 280px; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+
+        /* スマホでのタップ領域確保 */
+        button, a, input { min-height: 44px; outline: none; }
+    </style>
+</head>
+<body class="p-4 md:p-8 transition-colors duration-500">
+
+    <div class="max-w-5xl mx-auto">
+        <!-- ヘッダー -->
+        <header class="text-center mb-10 animate-fade-in">
+            <div id="badge" class="inline-block px-4 py-1 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold mb-3 tracking-widest uppercase shadow-sm">
+                Real-time Monitoring
+            </div>
+            <h1 class="text-2xl md:text-5xl font-black mb-4 gradient-text leading-tight">
+                令和8年 引津小学校<br>大規模環境美化作業 集計速報
+            </h1>
+            <p class="text-gray-500 text-sm font-medium">「地域の力で、最高の学び舎を子どもたちへ」</p>
+        </header>
+
+        <!-- メイン数値カード -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
+            <div class="stat-card bg-white p-6 md:p-8 rounded-3xl shadow-sm border-b-8 border-blue-600 text-center animate-fade-in" style="animation-delay: 0.1s;">
+                <div class="text-3xl mb-2 md:mb-3">👥</div>
+                <div class="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-1">Total Volunteers</div>
+                <div id="val-people" class="text-5xl md:text-6xl font-black text-slate-800 tracking-tighter">--</div>
+                <div class="text-[10px] text-gray-400 mt-2 font-bold tracking-tighter">参加予定人数（延べ）</div>
+            </div>
+
+            <div class="stat-card bg-white p-6 md:p-8 rounded-3xl shadow-sm border-b-8 border-emerald-500 text-center animate-fade-in" style="animation-delay: 0.2s;">
+                <div class="text-3xl mb-2 md:mb-3">🚛</div>
+                <div class="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-1">Machinery / Trucks</div>
+                <div id="val-trucks" class="text-5xl md:text-6xl font-black text-emerald-600 tracking-tighter">--</div>
+                <div class="text-[10px] text-emerald-600/60 mt-2 font-bold font-mono">TARGET: 15 UNITS</div>
+            </div>
+
+            <div class="stat-card bg-white p-6 md:p-8 rounded-3xl shadow-sm border-b-8 border-orange-500 text-center animate-fade-in" style="animation-delay: 0.3s;">
+                <div class="text-3xl mb-2 md:mb-3">✂️</div>
+                <div class="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-1">Grass Cutters</div>
+                <div id="val-cutters" class="text-5xl md:text-6xl font-black text-orange-600 tracking-tighter">--</div>
+                <div class="text-[10px] text-orange-600/60 mt-2 font-bold font-mono">TARGET: 20 UNITS</div>
+            </div>
+        </div>
+
+        <!-- プログレスバー -->
+        <div class="bg-white rounded-3xl shadow-sm p-6 md:p-10 mb-10 border border-gray-100 animate-fade-in" style="animation-delay: 0.4s;">
+            <h2 class="text-lg md:text-xl font-black mb-8 flex items-center text-slate-700">
+                <span class="w-1.5 h-6 bg-blue-600 rounded-full mr-3 shadow-sm"></span>
+                目標達成状況・機動力分析
+            </h2>
+            
+            <div class="space-y-8 md:y-10">
+                <div>
+                    <div class="flex justify-between mb-2 items-end">
+                        <span class="text-xs font-black text-slate-600 uppercase tracking-tighter">🚛 搬出機動力（車両部隊）</span>
+                        <span id="txt-truck-pct" class="text-xl font-black text-emerald-600">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-3.5 overflow-hidden shadow-inner">
+                        <div id="bar-truck" class="bg-emerald-500 h-full rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between mb-2 items-end">
+                        <span class="text-xs font-black text-slate-600 uppercase tracking-tighter">✂️ 切削能力（熟練工部隊）</span>
+                        <span id="txt-cutter-pct" class="text-xl font-black text-orange-600">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-3.5 overflow-hidden shadow-inner">
+                        <div id="bar-cutter" class="bg-orange-500 h-full rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 管理者用パネル -->
+        <section id="admin-view" class="admin-section bg-slate-900 rounded-3xl shadow-2xl p-6 md:p-8 text-white mb-10 border border-slate-700 animate-fade-in">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-4 shadow-lg">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    </div>
+                    <h2 class="text-xl font-black text-blue-400 tracking-tight">手動入力管理パネル</h2>
+                </div>
+                <div id="sync-status" class="text-[9px] bg-slate-800 px-3 py-1.5 rounded-full text-slate-400 font-bold border border-slate-700 inline-flex items-center self-start">
+                    <span id="sync-icon" class="w-1.5 h-1.5 bg-gray-500 rounded-full mr-2"></span>
+                    <span id="sync-text">INITIALIZING...</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">参加人数（合計）</label>
+                    <input type="number" inputmode="numeric" id="in-people" class="w-full bg-slate-800 border border-slate-700 rounded-2xl py-4 px-5 text-3xl font-black focus:ring-4 focus:ring-blue-500/30 outline-none transition-all shadow-inner text-white">
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-emerald-400 uppercase tracking-widest">トラック台数</label>
+                    <input type="number" inputmode="numeric" id="in-trucks" class="w-full bg-slate-800 border border-slate-700 rounded-2xl py-4 px-5 text-3xl font-black focus:ring-4 focus:ring-emerald-500/30 outline-none transition-all shadow-inner text-emerald-400">
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-orange-400 uppercase tracking-widest">刈払機台数</label>
+                    <input type="number" inputmode="numeric" id="in-cutters" class="w-full bg-slate-800 border border-slate-700 rounded-2xl py-4 px-5 text-3xl font-black focus:ring-4 focus:ring-orange-500/30 outline-none transition-all shadow-inner text-orange-400">
+                </div>
+            </div>
+
+            <button id="btn-save" class="w-full mt-8 bg-blue-600 hover:bg-blue-500 active:scale-[0.98] py-5 rounded-2xl text-lg font-black shadow-xl shadow-blue-900/30 transition-all flex items-center justify-center">
+                <span id="btn-text">クラウドへデータを反映する</span>
+            </button>
+        </section>
+
+        <!-- 閲覧者メッセージ -->
+        <div class="viewer-msg text-center p-8 border-2 border-dashed border-slate-200 rounded-[2.5rem] bg-slate-50/50 mb-10">
+            <p class="text-slate-400 text-xs font-bold tracking-tighter">📡 集計本部の更新をリアルタイムで待機中...</p>
+        </div>
+
+        <!-- フッター制御 -->
+        <footer class="mt-12 mb-12 text-center px-4">
+            <p class="text-slate-300 text-[9px] font-black uppercase tracking-[0.2em] mb-6 italic">© 2026 HIKITSU ELEMENTARY SCHOOL PTA</p>
+            
+            <div class="inline-flex bg-white p-1 rounded-2xl shadow-sm border border-slate-100 w-full max-w-sm overflow-hidden">
+                <button id="link-viewer" onclick="changeMode('')" class="flex-1 px-4 py-3 rounded-xl text-[10px] font-black transition-all">
+                    VIEWER
+                </button>
+                <button id="link-admin" onclick="changeMode('admin')" class="flex-1 px-4 py-3 rounded-xl text-[10px] font-black transition-all">
+                    ADMIN
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <div id="ui-message" class="px-6 py-4 bg-slate-800 text-white rounded-2xl shadow-2xl text-xs font-black border border-slate-600 flex items-center">
+        <span id="msg-content">通知があります</span>
+    </div>
+
+    <!-- Firebase SDK (ESM) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // --- Config Initialization ---
+        let firebaseConfig = {};
+        try {
+            if (typeof __firebase_config !== 'undefined') {
+                firebaseConfig = JSON.parse(__firebase_config);
+            }
+        } catch (e) {
+            console.error("Firebase config parse error", e);
+        }
+        
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'hikitsu-env-2026';
+        const GOALS = { trucks: 15, cutters: 20 };
+        const DOC_PATH = ["artifacts", appId, "public", "data", "statistics", "summary"];
+
+        // Initialize Firebase safely
+        let app, auth, db;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch (e) {
+            console.error("Firebase Init Error", e);
+        }
+
+        // --- UI Refs ---
+        const ui = {
+            badge: document.getElementById('badge'),
+            linkAdmin: document.getElementById('link-admin'),
+            linkViewer: document.getElementById('link-viewer'),
+            valPeople: document.getElementById('val-people'),
+            valTrucks: document.getElementById('val-trucks'),
+            valCutters: document.getElementById('val-cutters'),
+            txtTruckPct: document.getElementById('txt-truck-pct'),
+            txtCutterPct: document.getElementById('txt-cutter-pct'),
+            barTruck: document.getElementById('bar-truck'),
+            barCutter: document.getElementById('bar-cutter'),
+            inPeople: document.getElementById('in-people'),
+            inTrucks: document.getElementById('in-trucks'),
+            inCutters: document.getElementById('in-cutters'),
+            btnSave: document.getElementById('btn-save'),
+            syncStatusText: document.getElementById('sync-text'),
+            syncIcon: document.getElementById('sync-icon'),
+            uiMessage: document.getElementById('ui-message'),
+            msgContent: document.getElementById('msg-content')
+        };
+
+        function showMessage(text) {
+            if (!ui.msgContent || !ui.uiMessage) return;
+            ui.msgContent.innerText = text;
+            ui.uiMessage.style.display = 'flex';
+            setTimeout(() => { ui.uiMessage.style.display = 'none'; }, 4000);
+        }
+
+        // --- Mode Controller ---
+        function applyMode() {
+            try {
+                const isAdmin = window.location.hash === '#admin';
+                if (isAdmin) {
+                    document.body.classList.add('is-admin');
+                    if (ui.badge) {
+                        ui.badge.innerText = "ADMIN MANAGEMENT CONSOLE";
+                        ui.badge.className = "inline-block px-4 py-1 rounded-full bg-slate-800 text-blue-400 text-[10px] font-bold mb-3 tracking-widest uppercase shadow-lg";
+                    }
+                    if (ui.linkAdmin) ui.linkAdmin.className = "flex-1 px-4 py-3 rounded-xl text-[10px] font-black bg-slate-900 text-white shadow-md";
+                    if (ui.linkViewer) ui.linkViewer.className = "flex-1 px-4 py-3 rounded-xl text-[10px] font-black text-slate-400";
+                } else {
+                    document.body.classList.remove('is-admin');
+                    if (ui.badge) {
+                        ui.badge.innerText = "LIVE DATA PROCESSING";
+                        ui.badge.className = "inline-block px-4 py-1 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold mb-3 tracking-widest uppercase shadow-sm";
+                    }
+                    if (ui.linkViewer) ui.linkViewer.className = "flex-1 px-4 py-3 rounded-xl text-[10px] font-black bg-blue-600 text-white shadow-md";
+                    if (ui.linkAdmin) ui.linkAdmin.className = "flex-1 px-4 py-3 rounded-xl text-[10px] font-black text-slate-400";
+                }
+            } catch (e) {
+                console.error("applyMode Error", e);
+            }
+        }
+
+        window.changeMode = (mode) => {
+            if (mode === 'admin') {
+                window.location.hash = 'admin';
+            } else {
+                window.location.hash = '';
+                history.replaceState(null, null, ' ');
+            }
+            applyMode();
+        };
+
+        // Initialize state
+        window.addEventListener('hashchange', applyMode);
+        applyMode();
+
+        // --- Data Logic ---
+        const startSession = async () => {
+            if (!auth) return;
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                if (ui.syncStatusText) ui.syncStatusText.innerText = "AUTHENTICATED";
+                if (ui.syncIcon) ui.syncIcon.className = "w-1.5 h-1.5 bg-yellow-500 rounded-full mr-2";
+            } catch (err) {
+                console.error("Auth Error", err);
+            }
+        };
+
+        if (auth) {
+            onAuthStateChanged(auth, (user) => {
+                if (!user) return;
+                
+                if (ui.syncStatusText) ui.syncStatusText.innerText = "CLOUD SYNCING...";
+                if (ui.syncIcon) ui.syncIcon.className = "w-1.5 h-1.5 bg-green-500 rounded-full mr-2 animate-pulse";
+
+                onSnapshot(doc(db, ...DOC_PATH), (snap) => {
+                    if (snap.exists()) {
+                        const data = snap.data();
+                        renderData(data);
+                        if (document.activeElement.tagName !== 'INPUT') {
+                            if (ui.inPeople) ui.inPeople.value = data.people || 0;
+                            if (ui.inTrucks) ui.inTrucks.value = data.trucks || 0;
+                            if (ui.inCutters) ui.inCutters.value = data.cutters || 0;
+                        }
+                        if (ui.syncStatusText) ui.syncStatusText.innerText = "ONLINE / UPDATED";
+                        if (ui.syncIcon) ui.syncIcon.className = "w-1.5 h-1.5 bg-green-500 rounded-full mr-2";
+                    }
+                }, (err) => {
+                    console.error("Sync Error", err);
+                });
+            });
+        }
+
+        function renderData(data) {
+            const p = data.people || 0;
+            const t = data.trucks || 0;
+            const c = data.cutters || 0;
+
+            if (ui.valPeople) ui.valPeople.innerText = p.toLocaleString();
+            if (ui.valTrucks) ui.valTrucks.innerText = t.toLocaleString();
+            if (ui.valCutters) ui.valCutters.innerText = c.toLocaleString();
+
+            const tRate = Math.min(Math.round((t / GOALS.trucks) * 100), 100);
+            const cRate = Math.min(Math.round((c / GOALS.cutters) * 100), 100);
+
+            if (ui.txtTruckPct) ui.txtTruckPct.innerText = tRate + '%';
+            if (ui.txtCutterPct) ui.txtCutterPct.innerText = cRate + '%';
+            if (ui.barTruck) ui.barTruck.style.width = tRate + '%';
+            if (ui.barCutter) ui.barCutter.style.width = cRate + '%';
+        }
+
+        if (ui.btnSave) {
+            ui.btnSave.onclick = async () => {
+                if (!auth || !auth.currentUser) return;
+                
+                ui.btnSave.disabled = true;
+                const btnLabel = document.getElementById('btn-text');
+                const originalText = "クラウドへデータを反映する";
+                if (btnLabel) btnLabel.innerText = "送信中...";
+
+                try {
+                    await setDoc(doc(db, ...DOC_PATH), {
+                        people: parseInt(ui.inPeople.value) || 0,
+                        trucks: parseInt(ui.inTrucks.value) || 0,
+                        cutters: parseInt(ui.inCutters.value) || 0,
+                        lastUpdate: new Date()
+                    }, { merge: true });
+                    
+                    if (btnLabel) btnLabel.innerText = "更新完了！";
+                    showMessage("集計データを更新しました。");
+                    setTimeout(() => {
+                        if (btnLabel) btnLabel.innerText = originalText;
+                        ui.btnSave.disabled = false;
+                    }, 2000);
+                } catch (err) {
+                    showMessage("保存エラーが発生しました。");
+                    if (btnLabel) btnLabel.innerText = originalText;
+                    ui.btnSave.disabled = false;
+                }
+            };
+        }
+
+        startSession();
+    </script>
+</body>
+</html>
