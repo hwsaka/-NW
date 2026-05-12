@@ -6,9 +6,6 @@
 <title>令和8年 引津小学校 環境美化作業 速報</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Oswald:wght@600;700&display=swap" rel="stylesheet">
 <style>
-/* ════════════════════════════════
-   変数・リセット
-════════════════════════════════ */
 :root {
   --navy  : #1a2e5a;
   --teal  : #0d9e8a;
@@ -22,9 +19,6 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-/* ════════════════════════════════
-   HEADER
-════════════════════════════════ */
 header { background: var(--navy); position: relative; overflow: hidden; }
 header::after {
   content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 4px;
@@ -49,9 +43,14 @@ h1 em { color: var(--gold); font-style: normal; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 .pulse { width: 7px; height: 7px; border-radius: 50%; background: #fff; animation: blink 1.6s infinite; }
 
-/* ════════════════════════════════
-   MAIN
-════════════════════════════════ */
+.fetch-bar {
+  background: rgba(255,255,255,.07); border-top: 1px solid rgba(255,255,255,.08);
+  padding: .5rem 1.5rem; font-size: .7rem; color: rgba(255,255,255,.5);
+  display: flex; align-items: center; gap: .5rem;
+}
+.fetch-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); }
+.fetch-dot.spin { animation: blink .5s infinite; }
+
 main { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
 
 .date-strip {
@@ -68,9 +67,6 @@ main { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
 }
 .section-label::after { content: ''; flex: 1; height: 1px; background: #ddd; }
 
-/* ════════════════════════════════
-   STAT CARDS
-════════════════════════════════ */
 .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: .75rem; }
 @media (min-width: 580px) { .stat-grid { grid-template-columns: repeat(4, 1fr); } }
 
@@ -113,14 +109,12 @@ main { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
 
 .updated-bar { text-align: right; font-size: .72rem; color: var(--muted); margin-bottom: 2rem; margin-top: .4rem; }
 
-/* 未公表バナー */
-.no-data-banner {
-  background: #f8f8f8; border: 1.5px dashed #ccc; border-radius: 8px;
-  padding: 2rem; text-align: center; color: var(--muted);
-  font-size: .88rem; line-height: 1.8; margin-bottom: 2rem;
+.error-bar {
+  background: #fff3cd; border: 1px solid #f0c040; border-radius: 6px;
+  padding: .7rem 1rem; font-size: .8rem; color: #7a5a00;
+  margin-bottom: 1.5rem; display: none;
 }
 
-/* コメント */
 .msg-wrap { margin-bottom: 2.5rem; }
 .msg-card {
   background: #e8f8f5; border: 1px solid #b2e4d8; border-radius: 8px;
@@ -130,114 +124,10 @@ main { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
 
 .contact-block { font-size: .82rem; color: var(--muted); line-height: 2; margin-bottom: 3rem; }
 footer { text-align: center; font-size: .7rem; color: #bbb; padding: 2rem 1.5rem; border-top: 1px solid #ddd; }
-
-/* ════════════════════════════════
-   管理ボタン（右下固定）
-════════════════════════════════ */
-#admin-btn {
-  position: fixed; bottom: 1.5rem; right: 1.5rem;
-  width: 48px; height: 48px; border-radius: 50%;
-  background: var(--navy); color: #fff;
-  border: none; font-size: 1.2rem; cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0,0,0,.25);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 100; transition: background .2s;
-}
-#admin-btn:hover { background: var(--teal); }
-
-/* ════════════════════════════════
-   パスワードオーバーレイ
-════════════════════════════════ */
-.overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,.55); z-index: 200;
-  align-items: center; justify-content: center;
-}
-.overlay.open { display: flex; }
-
-.pw-box {
-  background: #fff; border-radius: 12px; padding: 2rem 2rem 1.5rem;
-  width: 300px; text-align: center;
-  box-shadow: 0 20px 60px rgba(0,0,0,.3);
-}
-.pw-box h2 { font-size: 1rem; font-weight: 900; margin-bottom: 1.2rem; color: var(--navy); }
-.pw-box input[type="password"] {
-  width: 100%; padding: .7rem 1rem; border: 1.5px solid #ddd; border-radius: 6px;
-  font-size: 1rem; font-family: inherit; text-align: center; letter-spacing: .2em;
-  margin-bottom: .75rem;
-}
-.pw-box input:focus { outline: none; border-color: var(--teal); }
-.pw-box button {
-  width: 100%; padding: .75rem; background: var(--navy); color: #fff;
-  border: none; border-radius: 6px; font-size: .95rem; font-weight: 700;
-  font-family: inherit; cursor: pointer;
-}
-.pw-box button:hover { background: var(--teal); }
-.pw-err { color: var(--orange); font-size: .78rem; margin-top: .6rem; min-height: 1.2em; }
-
-/* ════════════════════════════════
-   管理パネル
-════════════════════════════════ */
-#admin-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,.6); z-index: 300;
-  align-items: flex-start; justify-content: center;
-  padding: 2rem 1rem; overflow-y: auto;
-}
-#admin-overlay.open { display: flex; }
-
-.admin-box {
-  background: #fff; border-radius: 12px;
-  width: 100%; max-width: 480px; padding: 2rem;
-  box-shadow: 0 24px 80px rgba(0,0,0,.35); margin: auto;
-}
-.admin-box h2 { font-size: 1.1rem; font-weight: 900; color: var(--navy); margin-bottom: .25rem; }
-.admin-box .admin-sub { font-size: .78rem; color: var(--muted); margin-bottom: 1.5rem; }
-
-.admin-row {
-  display: flex; align-items: center; gap: .75rem; margin-bottom: .9rem;
-}
-.admin-row label { flex: 1; font-size: .88rem; font-weight: 700; }
-.admin-row label small { display: block; font-size: .7rem; font-weight: 400; color: var(--muted); }
-.admin-row input[type="number"] {
-  width: 88px; padding: .55rem .75rem;
-  border: 1.5px solid #ddd; border-radius: 6px;
-  font-size: 1.1rem; font-family: 'Oswald', sans-serif; font-weight: 700;
-  text-align: center;
-}
-.admin-row input:focus { outline: none; border-color: var(--teal); }
-
-.admin-divider { height: 1px; background: #eee; margin: 1.2rem 0; }
-
-.admin-msg-row { margin-bottom: 1.2rem; }
-.admin-msg-row label { display: block; font-size: .88rem; font-weight: 700; margin-bottom: .4rem; }
-.admin-msg-row label small { font-size: .7rem; font-weight: 400; color: var(--muted); }
-.admin-msg-row textarea {
-  width: 100%; height: 80px; padding: .6rem .75rem;
-  border: 1.5px solid #ddd; border-radius: 6px;
-  font-size: .88rem; font-family: 'Noto Sans JP', sans-serif; resize: vertical;
-}
-.admin-msg-row textarea:focus { outline: none; border-color: var(--teal); }
-
-.admin-btns { display: flex; gap: .75rem; margin-top: 1.5rem; }
-.btn-publish {
-  flex: 1; padding: .85rem; background: var(--teal); color: #fff;
-  border: none; border-radius: 6px; font-size: 1rem; font-weight: 700;
-  font-family: inherit; cursor: pointer; transition: background .2s;
-}
-.btn-publish:hover { background: #0a8070; }
-.btn-close {
-  padding: .85rem 1.2rem; background: #f0f0f0; color: var(--text);
-  border: none; border-radius: 6px; font-size: .9rem; font-weight: 700;
-  font-family: inherit; cursor: pointer;
-}
-.btn-close:hover { background: #e0e0e0; }
-.publish-ok { text-align: center; font-size: .85rem; color: var(--teal); font-weight: 700; margin-top: .75rem; min-height: 1.3em; }
 </style>
 </head>
 <body>
 
-<!-- ════ HEADER ════ -->
 <header>
   <div class="header-inner">
     <div class="eyebrow">令和8年度 引津小学校 伝統行事</div>
@@ -245,9 +135,12 @@ footer { text-align: center; font-size: .7rem; color: #bbb; padding: 2rem 1.5rem
     <h1>大規模環境美化作業<br><em>参加状況 速報</em></h1>
     <p class="header-sub">5月23日（土）実施　／　引津小学校 あおぞら会</p>
   </div>
+  <div class="fetch-bar">
+    <span class="fetch-dot" id="fetch-dot"></span>
+    <span id="fetch-status">データを読み込み中...</span>
+  </div>
 </header>
 
-<!-- ════ MAIN ════ -->
 <main>
   <div class="date-strip">
     <strong>5月23日（土）</strong>
@@ -255,51 +148,47 @@ footer { text-align: center; font-size: .7rem; color: #bbb; padding: 2rem 1.5rem
     <span class="sep">|</span><span>予備日：5月30日（土）</span>
   </div>
 
-  <!-- 未公表のとき -->
-  <div class="no-data-banner" id="no-data">
-    現在、集計データを準備中です。<br>
-    当日の状況は随時更新いたします。
+  <div class="error-bar" id="error-bar">
+    ⚠️ データの取得に失敗しました。しばらくすると自動で再試行します。
   </div>
 
-  <!-- 集計カード（公表後に表示） -->
-  <div id="data-area" style="display:none">
-    <div class="section-label">参加・機材 集計</div>
-    <div class="stat-grid">
-      <div class="stat-card c-teal" id="card-23">
-        <div class="stat-icon">👥</div>
-        <div class="stat-name">5/23（土）<br>参加人数</div>
-        <div><span class="stat-num" id="num-23">0</span><span class="stat-unit">名</span></div>
-        <div class="prog-wrap"><div class="prog-bar" id="prog-23"></div></div>
-        <div class="stat-target">目標：130名規模</div>
-      </div>
-      <div class="stat-card c-navy" id="card-30">
-        <div class="stat-icon">📅</div>
-        <div class="stat-name">5/30（土）<br>予備日参加可</div>
-        <div><span class="stat-num" id="num-30">0</span><span class="stat-unit">名</span></div>
-        <div class="prog-wrap"><div class="prog-bar" id="prog-30"></div></div>
-        <div class="stat-target">目標：130名規模</div>
-      </div>
-      <div class="stat-card c-orange" id="card-cutter">
-        <div class="stat-icon">✂️</div>
-        <div class="stat-name">刈払機<br>持込台数</div>
-        <div><span class="stat-num" id="num-cutter">0</span><span class="stat-unit">台</span></div>
-        <div class="prog-wrap"><div class="prog-bar" id="prog-cutter"></div></div>
-        <div class="stat-target">目標：20台規模</div>
-      </div>
-      <div class="stat-card c-gold" id="card-truck">
-        <div class="stat-icon">🛻</div>
-        <div class="stat-name">軽トラ<br>持込台数</div>
-        <div><span class="stat-num" id="num-truck">0</span><span class="stat-unit">台</span></div>
-        <div class="prog-wrap"><div class="prog-bar" id="prog-truck"></div></div>
-        <div class="stat-target">目標：15台規模</div>
-      </div>
+  <div class="section-label">参加・機材 集計</div>
+  <div class="stat-grid">
+    <div class="stat-card c-teal" id="card-23">
+      <div class="stat-icon">👥</div>
+      <div class="stat-name">5/23（土）<br>参加人数</div>
+      <div><span class="stat-num" id="num-23">—</span><span class="stat-unit">名</span></div>
+      <div class="prog-wrap"><div class="prog-bar" id="prog-23"></div></div>
+      <div class="stat-target">目標：130名規模</div>
     </div>
-    <div class="updated-bar">最終更新：<span id="updated-at">—</span></div>
+    <div class="stat-card c-navy" id="card-30">
+      <div class="stat-icon">📅</div>
+      <div class="stat-name">5/30（土）<br>予備日参加可</div>
+      <div><span class="stat-num" id="num-30">—</span><span class="stat-unit">名</span></div>
+      <div class="prog-wrap"><div class="prog-bar" id="prog-30"></div></div>
+      <div class="stat-target">目標：130名規模</div>
+    </div>
+    <div class="stat-card c-orange" id="card-cutter">
+      <div class="stat-icon">✂️</div>
+      <div class="stat-name">刈払機<br>持込台数</div>
+      <div><span class="stat-num" id="num-cutter">—</span><span class="stat-unit">台</span></div>
+      <div class="prog-wrap"><div class="prog-bar" id="prog-cutter"></div></div>
+      <div class="stat-target">目標：20台規模</div>
+    </div>
+    <div class="stat-card c-gold" id="card-truck">
+      <div class="stat-icon">🛻</div>
+      <div class="stat-name">軽トラ<br>持込台数</div>
+      <div><span class="stat-num" id="num-truck">—</span><span class="stat-unit">台</span></div>
+      <div class="prog-wrap"><div class="prog-bar" id="prog-truck"></div></div>
+      <div class="stat-target">目標：15台規模</div>
+    </div>
+  </div>
 
-    <div class="msg-wrap" id="msg-wrap" style="display:none">
-      <div class="section-label">事務局コメント</div>
-      <div class="msg-card" id="msg-display"></div>
-    </div>
+  <div class="updated-bar">最終更新：<span id="updated-at">取得中...</span></div>
+
+  <div class="msg-wrap" id="msg-wrap" style="display:none">
+    <div class="section-label">事務局コメント</div>
+    <div class="msg-card" id="msg-display"></div>
   </div>
 
   <div class="section-label">お問い合わせ</div>
@@ -311,109 +200,77 @@ footer { text-align: center; font-size: .7rem; color: #bbb; padding: 2rem 1.5rem
 
 <footer>&copy; 2026 HIKITSU ELEMENTARY SCHOOL PTA. ALL RIGHTS RESERVED.</footer>
 
-<!-- ════ 管理ボタン（右下🔒） ════ -->
-<button id="admin-btn" title="管理者ログイン">🔒</button>
-
-<!-- ════ パスワードオーバーレイ ════ -->
-<div class="overlay" id="pw-overlay">
-  <div class="pw-box">
-    <h2>🔐 管理者ログイン</h2>
-    <input type="password" id="pw-input" placeholder="パスワードを入力" maxlength="30">
-    <button id="pw-submit">ログイン</button>
-    <div class="pw-err" id="pw-err"></div>
-  </div>
-</div>
-
-<!-- ════ 管理パネル ════ -->
-<div id="admin-overlay">
-  <div class="admin-box">
-    <h2>📋 速報データを更新</h2>
-    <p class="admin-sub">数字を入力して「公開する」を押すと即時反映されます</p>
-
-    <div class="admin-row">
-      <label>5/23（土）参加人数 <small>名</small></label>
-      <input type="number" id="in-23" min="0" max="999" placeholder="0">
-    </div>
-    <div class="admin-row">
-      <label>5/30（土）予備日参加可 <small>名</small></label>
-      <input type="number" id="in-30" min="0" max="999" placeholder="0">
-    </div>
-    <div class="admin-divider"></div>
-    <div class="admin-row">
-      <label>刈払機 持込台数 <small>台</small></label>
-      <input type="number" id="in-cutter" min="0" max="99" placeholder="0">
-    </div>
-    <div class="admin-row">
-      <label>軽トラ 持込台数 <small>台</small></label>
-      <input type="number" id="in-truck" min="0" max="99" placeholder="0">
-    </div>
-    <div class="admin-divider"></div>
-    <div class="admin-msg-row">
-      <label>事務局コメント <small>任意・空欄でOK</small></label>
-      <textarea id="in-msg" placeholder="例：皆様のご協力のおかげで予定より早く完了しました！"></textarea>
-    </div>
-
-    <div class="admin-btns">
-      <button class="btn-publish" id="btn-publish">公開する</button>
-      <button class="btn-close"   id="btn-close">閉じる</button>
-    </div>
-    <div class="publish-ok" id="publish-ok"></div>
-  </div>
-</div>
-
 <script>
-// ════════════════════════════════
-// 設定
-// ════════════════════════════════
-var PASSWORD    = 'hikitsu2026';   // ★ パスワードをここで変更
-var STORAGE_KEY = 'hikitsu_v2';
+// Apps Script URL（設定済み）
+var API_URL = 'https://script.google.com/macros/s/AKfycbzhPrEZNQBR1Oi45RElQGpP0AM_9xYkqcxipjmZV1q7Z5BuDCLwiKa91fAXxrtZ2NlBWA/exec';
+
 var TARGETS     = { day23: 130, day30: 130, cutters: 20, trucks: 15 };
+var INTERVAL_MS = 30000;
 
-// ════════════════════════════════
-// localStorage 読み書き
-// ════════════════════════════════
-function load() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch(e) { return null; }
+var dotEl     = document.getElementById('fetch-dot');
+var statusEl  = document.getElementById('fetch-status');
+var errorEl   = document.getElementById('error-bar');
+var updatedEl = document.getElementById('updated-at');
+var msgWrapEl = document.getElementById('msg-wrap');
+var msgDispEl = document.getElementById('msg-display');
+
+function fetchData() {
+  dotEl.classList.add('spin');
+  var cbName = '_cb' + Date.now();
+
+  var timer = setTimeout(function() {
+    cleanup(cbName);
+    showError();
+  }, 10000);
+
+  window[cbName] = function(data) {
+    clearTimeout(timer);
+    cleanup(cbName);
+    errorEl.style.display = 'none';
+    renderData(data);
+  };
+
+  var script = document.createElement('script');
+  script.src = API_URL + '?callback=' + cbName + '&t=' + Date.now();
+  script.onerror = function() {
+    clearTimeout(timer);
+    cleanup(cbName);
+    showError();
+  };
+  document.head.appendChild(script);
 }
-function save(data) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
+function cleanup(cbName) {
+  dotEl.classList.remove('spin');
+  delete window[cbName];
+  var old = document.head.querySelector('script[src*="' + cbName + '"]');
+  if (old) document.head.removeChild(old);
 }
 
-// ════════════════════════════════
-// 画面表示
-// ════════════════════════════════
-function render(data) {
-  var noData   = document.getElementById('no-data');
-  var dataArea = document.getElementById('data-area');
+function showError() {
+  errorEl.style.display = 'block';
+  statusEl.textContent  = '取得失敗 — 再試行中...';
+}
 
-  if (!data) {
-    noData.style.display   = '';
-    dataArea.style.display = 'none';
-    return;
+function renderData(d) {
+  setCard('23',     d.day23,   TARGETS.day23);
+  setCard('30',     d.day30,   TARGETS.day30);
+  setCard('cutter', d.cutters, TARGETS.cutters);
+  setCard('truck',  d.trucks,  TARGETS.trucks);
+
+  if (d.updatedAt) {
+    var t = new Date(d.updatedAt);
+    updatedEl.textContent =
+      (t.getMonth()+1) + '月' + t.getDate() + '日 ' +
+      pad(t.getHours()) + ':' + pad(t.getMinutes()) + ' 公表';
   }
+  statusEl.textContent = '最新データを表示中';
 
-  noData.style.display   = 'none';
-  dataArea.style.display = '';
-
-  setCard('23',     data.day23,   TARGETS.day23);
-  setCard('30',     data.day30,   TARGETS.day30);
-  setCard('cutter', data.cutters, TARGETS.cutters);
-  setCard('truck',  data.trucks,  TARGETS.trucks);
-
-  if (data.updatedAt) {
-    var d = new Date(data.updatedAt);
-    document.getElementById('updated-at').textContent =
-      (d.getMonth()+1) + '月' + d.getDate() + '日 ' +
-      pad(d.getHours()) + ':' + pad(d.getMinutes()) + ' 公表';
-  }
-
-  var msgWrap = document.getElementById('msg-wrap');
-  var msgDisp = document.getElementById('msg-display');
-  if (data.message && data.message.trim()) {
-    msgDisp.textContent     = data.message.trim();
-    msgWrap.style.display   = '';
+  if (d.message) {
+    msgDispEl.textContent   = d.message;
+    msgWrapEl.style.display = '';
   } else {
-    msgWrap.style.display   = 'none';
+    msgWrapEl.style.display = 'none';
   }
 }
 
@@ -421,7 +278,7 @@ function setCard(key, val, target) {
   var numEl  = document.getElementById('num-'  + key);
   var progEl = document.getElementById('prog-' + key);
   var cardEl = document.getElementById('card-' + key);
-  var disp   = (val === null || val === undefined) ? '0' : String(val);
+  var disp   = (val === null || val === undefined) ? '—' : String(val);
 
   if (numEl.textContent !== disp) {
     numEl.textContent = disp;
@@ -438,79 +295,8 @@ function setCard(key, val, target) {
 
 function pad(n) { return n < 10 ? '0' + n : String(n); }
 
-// ════════════════════════════════
-// パスワード認証
-// ════════════════════════════════
-document.getElementById('admin-btn').addEventListener('click', function() {
-  document.getElementById('pw-input').value = '';
-  document.getElementById('pw-err').textContent = '';
-  document.getElementById('pw-overlay').classList.add('open');
-  setTimeout(function(){ document.getElementById('pw-input').focus(); }, 80);
-});
-
-function tryLogin() {
-  if (document.getElementById('pw-input').value === PASSWORD) {
-    document.getElementById('pw-overlay').classList.remove('open');
-    openAdmin();
-  } else {
-    document.getElementById('pw-err').textContent = 'パスワードが違います';
-    document.getElementById('pw-input').select();
-  }
-}
-document.getElementById('pw-submit').addEventListener('click', tryLogin);
-document.getElementById('pw-input').addEventListener('keydown', function(e){
-  if (e.key === 'Enter') tryLogin();
-});
-document.getElementById('pw-overlay').addEventListener('click', function(e){
-  if (e.target === this) this.classList.remove('open');
-});
-
-// ════════════════════════════════
-// 管理パネル
-// ════════════════════════════════
-function openAdmin() {
-  var data = load();
-  document.getElementById('in-23').value     = data ? (data.day23   ?? '') : '';
-  document.getElementById('in-30').value     = data ? (data.day30   ?? '') : '';
-  document.getElementById('in-cutter').value = data ? (data.cutters ?? '') : '';
-  document.getElementById('in-truck').value  = data ? (data.trucks  ?? '') : '';
-  document.getElementById('in-msg').value    = data ? (data.message ?? '') : '';
-  document.getElementById('publish-ok').textContent = '';
-  document.getElementById('admin-overlay').classList.add('open');
-}
-
-document.getElementById('btn-close').addEventListener('click', function(){
-  document.getElementById('admin-overlay').classList.remove('open');
-});
-document.getElementById('admin-overlay').addEventListener('click', function(e){
-  if (e.target === this) this.classList.remove('open');
-});
-
-document.getElementById('btn-publish').addEventListener('click', function() {
-  function toNum(id) {
-    var v = parseInt(document.getElementById(id).value, 10);
-    return isNaN(v) ? 0 : v;
-  }
-  var data = {
-    day23    : toNum('in-23'),
-    day30    : toNum('in-30'),
-    cutters  : toNum('in-cutter'),
-    trucks   : toNum('in-truck'),
-    message  : document.getElementById('in-msg').value,
-    updatedAt: new Date().toISOString(),
-  };
-  save(data);
-  render(data);
-
-  var okEl = document.getElementById('publish-ok');
-  okEl.textContent = '✅ 公開しました！';
-  setTimeout(function(){ okEl.textContent = ''; }, 3000);
-});
-
-// ════════════════════════════════
-// 初期表示
-// ════════════════════════════════
-render(load());
+fetchData();
+setInterval(fetchData, INTERVAL_MS);
 </script>
 </body>
 </html>
