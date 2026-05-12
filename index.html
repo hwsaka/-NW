@@ -8,63 +8,70 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap');
         body { font-family: 'Noto Sans JP', sans-serif; background-color: #f8fafc; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
-        .stat-card { transition: all 0.3s ease; }
+        .stat-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .gradient-text { background: linear-gradient(135deg, #1e40af, #047857); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        .admin-section { display: none; }
-        body.is-admin .admin-section { display: block; }
-        body.is-admin .viewer-msg { display: none; }
-        body.is-admin { background-color: #f1f5f9; }
+        /* 管理モード表示切り替え用CSS */
+        .mode-viewer .admin-only { display: none !important; }
+        .mode-admin .viewer-only { display: none !important; }
+        .mode-admin { background-color: #f1f5f9; }
 
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         
-        #ui-message { display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 100; min-width: 280px; }
+        #toast { display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 999; }
         
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes slideIn { from { opacity: 0; transform: translate(-50%, 20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+        .animate-slide-in { animation: slideIn 0.4s ease-out forwards; }
 
-        button, a, input { min-height: 44px; outline: none; border: none; }
+        button { -webkit-appearance: none; cursor: pointer; transition: all 0.2s; }
+        button:active { transform: scale(0.96); }
     </style>
 </head>
-<body class="p-4 md:p-8 transition-colors duration-500">
+<body class="mode-viewer p-4 md:p-8">
 
     <div class="max-w-5xl mx-auto">
         <!-- ヘッダー -->
-        <header class="text-center mb-10 animate-fade-in">
+        <header class="text-center mb-8">
             <div id="badge" class="inline-block px-4 py-1 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold mb-3 tracking-widest uppercase shadow-sm">
                 Real-time Monitoring
             </div>
-            <h1 class="text-2xl md:text-5xl font-black mb-4 gradient-text leading-tight">
+            <h1 class="text-2xl md:text-5xl font-black mb-3 gradient-text leading-tight">
                 令和8年 引津小学校<br>大規模環境美化作業 集計速報
             </h1>
-            <p class="text-gray-500 text-sm font-medium">「地域の力で、最高の学び舎を子どもたちへ」</p>
+            <p class="text-gray-500 text-sm font-medium">地域の力で、最高の学び舎を子どもたちへ</p>
         </header>
 
-        <!-- 数値カード -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
-            <div class="stat-card bg-white p-6 md:p-8 rounded-3xl shadow-sm border-b-8 border-blue-600 text-center animate-fade-in" style="animation-delay: 0.1s;">
-                <div class="text-3xl mb-2 md:mb-3">👥</div>
-                <div id="val-people" class="text-5xl md:text-6xl font-black text-slate-800 tracking-tighter">--</div>
-                <div class="text-[10px] text-gray-400 mt-2 font-bold uppercase tracking-widest">Total Volunteers</div>
+        <!-- メイン統計カード -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <!-- 参加人数 -->
+            <div class="stat-card bg-white p-6 rounded-3xl shadow-sm border-b-8 border-blue-600 text-center">
+                <div class="text-3xl mb-2">👥</div>
+                <div class="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-1">Total Volunteers</div>
+                <div id="display-people" class="text-5xl font-black text-slate-800">--</div>
+                <div class="text-[10px] text-gray-400 mt-2 font-bold uppercase tracking-widest">参加人数（延べ）</div>
             </div>
 
-            <div class="stat-card bg-white p-6 md:p-8 rounded-3xl shadow-sm border-b-8 border-emerald-500 text-center animate-fade-in" style="animation-delay: 0.2s;">
-                <div class="text-3xl mb-2 md:mb-3">🚛</div>
-                <div id="val-trucks" class="text-5xl md:text-6xl font-black text-emerald-600 tracking-tighter">--</div>
-                <div class="text-[10px] text-emerald-600/60 mt-2 font-bold font-mono uppercase tracking-widest">Target: 15 Units</div>
+            <!-- トラック -->
+            <div class="stat-card bg-white p-6 rounded-3xl shadow-sm border-b-8 border-emerald-500 text-center">
+                <div class="text-3xl mb-2">🚛</div>
+                <div class="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-1">Trucks / Machinery</div>
+                <div id="display-trucks" class="text-5xl font-black text-emerald-600">--</div>
+                <div class="text-[10px] text-emerald-600/60 mt-2 font-bold font-mono tracking-widest uppercase">Target: 15 Units</div>
             </div>
 
-            <div class="stat-card bg-white p-6 md:p-8 rounded-3xl shadow-sm border-b-8 border-orange-500 text-center animate-fade-in" style="animation-delay: 0.3s;">
-                <div class="text-3xl mb-2 md:mb-3">✂️</div>
-                <div id="val-cutters" class="text-5xl md:text-6xl font-black text-orange-600 tracking-tighter">--</div>
-                <div class="text-[10px] text-orange-600/60 mt-2 font-bold font-mono uppercase tracking-widest">Target: 20 Units</div>
+            <!-- 刈払機 -->
+            <div class="stat-card bg-white p-6 rounded-3xl shadow-sm border-b-8 border-orange-500 text-center">
+                <div class="text-3xl mb-2">✂️</div>
+                <div class="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-1">Grass Cutters</div>
+                <div id="display-cutters" class="text-5xl font-black text-orange-600">--</div>
+                <div class="text-[10px] text-orange-600/60 mt-2 font-bold font-mono tracking-widest uppercase">Target: 20 Units</div>
             </div>
         </div>
 
         <!-- 目標達成率 -->
-        <div class="bg-white rounded-3xl shadow-sm p-6 md:p-10 mb-10 border border-gray-100 animate-fade-in" style="animation-delay: 0.4s;">
-            <h2 class="text-lg md:text-xl font-black mb-8 flex items-center text-slate-700">
-                <span class="w-1.5 h-6 bg-blue-600 rounded-full mr-3 shadow-sm"></span>
+        <div class="bg-white rounded-3xl shadow-sm p-6 md:p-10 mb-10 border border-gray-100">
+            <h2 class="text-lg font-black mb-8 flex items-center text-slate-700">
+                <span class="w-1.5 h-6 bg-blue-600 rounded-full mr-3"></span>
                 目標達成状況・機動力分析
             </h2>
             <div class="space-y-8">
@@ -73,7 +80,7 @@
                         <span class="text-xs font-black text-slate-600 tracking-tighter uppercase">🚛 搬出機動力（車両部隊）</span>
                         <span id="txt-truck-pct" class="text-xl font-black text-emerald-600">0%</span>
                     </div>
-                    <div class="w-full bg-gray-100 rounded-full h-3.5 overflow-hidden shadow-inner">
+                    <div class="w-full bg-gray-100 rounded-full h-4 overflow-hidden shadow-inner">
                         <div id="bar-truck" class="bg-emerald-500 h-full rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
                     </div>
                 </div>
@@ -82,66 +89,65 @@
                         <span class="text-xs font-black text-slate-600 tracking-tighter uppercase">✂️ 切削能力（熟練工部隊）</span>
                         <span id="txt-cutter-pct" class="text-xl font-black text-orange-600">0%</span>
                     </div>
-                    <div class="w-full bg-gray-100 rounded-full h-3.5 overflow-hidden shadow-inner">
+                    <div class="w-full bg-gray-100 rounded-full h-4 overflow-hidden shadow-inner">
                         <div id="bar-cutter" class="bg-orange-500 h-full rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 管理パネル -->
-        <section id="admin-section" class="admin-section bg-slate-900 rounded-3xl shadow-2xl p-6 md:p-8 text-white mb-10 border border-slate-700 animate-fade-in">
-            <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-                <div class="flex items-center">
-                    <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-4 shadow-lg shadow-blue-500/20">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                    </div>
-                    <h2 class="text-xl font-black text-blue-400 tracking-tight tracking-widest uppercase">Admin Panel</h2>
-                </div>
-                <div id="sync-status" class="text-[9px] bg-slate-800 px-3 py-1.5 rounded-full text-slate-400 font-bold border border-slate-700 inline-flex items-center self-start">
-                    <span id="sync-icon" class="w-1.5 h-1.5 bg-gray-500 rounded-full mr-2"></span>
-                    <span id="sync-text">INITIALIZING...</span>
+        <!-- 【管理パネル】モード切替で表示 -->
+        <section class="admin-only bg-slate-900 rounded-3xl shadow-2xl p-6 md:p-8 text-white mb-10 border border-slate-700">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-xl font-black text-blue-400 flex items-center">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    手動入力パネル
+                </h2>
+                <div class="text-[9px] bg-slate-800 px-3 py-1 rounded-full text-slate-400 font-bold border border-slate-700 flex items-center">
+                    <span id="sync-dot" class="w-1.5 h-1.5 bg-gray-500 rounded-full mr-2"></span>
+                    <span id="sync-label">OFFLINE</span>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="space-y-2">
                     <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">参加人数（合計）</label>
-                    <input type="number" inputmode="numeric" id="in-people" class="w-full bg-slate-800 border border-slate-700 rounded-2xl py-4 px-5 text-3xl font-black focus:ring-4 focus:ring-blue-500/30 outline-none text-white transition-all shadow-inner">
+                    <input type="number" inputmode="numeric" id="input-people" class="w-full bg-slate-800 border border-slate-700 rounded-2xl py-4 px-5 text-3xl font-black focus:ring-4 focus:ring-blue-500/30 outline-none text-white transition-all shadow-inner">
                 </div>
                 <div class="space-y-2">
                     <label class="block text-[10px] font-bold text-emerald-400 uppercase tracking-widest">トラック台数</label>
-                    <input type="number" inputmode="numeric" id="in-trucks" class="w-full bg-slate-800 border border-slate-700 rounded-2xl py-4 px-5 text-3xl font-black focus:ring-4 focus:ring-emerald-500/30 outline-none text-emerald-400 transition-all shadow-inner">
+                    <input type="number" inputmode="numeric" id="input-trucks" class="w-full bg-slate-800 border border-slate-700 rounded-2xl py-4 px-5 text-3xl font-black focus:ring-4 focus:ring-emerald-500/30 outline-none text-emerald-400 transition-all shadow-inner">
                 </div>
                 <div class="space-y-2">
                     <label class="block text-[10px] font-bold text-orange-400 uppercase tracking-widest">刈払機台数</label>
-                    <input type="number" inputmode="numeric" id="in-cutters" class="w-full bg-slate-800 border border-slate-700 rounded-2xl py-4 px-5 text-3xl font-black focus:ring-4 focus:ring-orange-500/30 outline-none text-orange-400 transition-all shadow-inner">
+                    <input type="number" inputmode="numeric" id="input-cutters" class="w-full bg-slate-800 border border-slate-700 rounded-2xl py-4 px-5 text-3xl font-black focus:ring-4 focus:ring-orange-500/30 outline-none text-orange-400 transition-all shadow-inner">
                 </div>
             </div>
 
-            <button id="btn-save" class="w-full mt-8 bg-blue-600 hover:bg-blue-500 active:scale-[0.98] py-5 rounded-2xl text-lg font-black shadow-xl shadow-blue-900/30 transition-all flex items-center justify-center">
-                <span id="btn-text">クラウドへデータを反映する</span>
+            <button id="btn-save" class="w-full mt-8 bg-blue-600 hover:bg-blue-500 py-5 rounded-2xl text-lg font-black shadow-xl shadow-blue-900/40 transition-all flex items-center justify-center">
+                <span id="btn-save-text">クラウドへデータを反映する</span>
             </button>
         </section>
 
-        <!-- 閲覧用メッセージ -->
-        <div class="viewer-msg text-center p-8 border-2 border-dashed border-slate-200 rounded-[2.5rem] bg-slate-50/50 mb-10">
-            <p class="text-slate-400 text-xs font-bold tracking-tighter">📡 集計本部の更新をリアルタイムで待機中...</p>
+        <!-- 閲覧者向けメッセージ -->
+        <div class="viewer-only text-center p-8 border-2 border-dashed border-slate-200 rounded-[2.5rem] bg-slate-50/50 mb-10">
+            <p class="text-slate-400 text-xs font-bold tracking-tighter italic">📡 集計本部の更新をリアルタイムで待機中...</p>
         </div>
 
-        <!-- フッター制御 -->
-        <footer class="mt-12 mb-12 text-center px-4">
-            <p class="text-slate-300 text-[9px] font-black uppercase tracking-[0.2em] mb-6 italic">© 2026 HIKITSU ELEMENTARY SCHOOL PTA</p>
-            <div class="inline-flex bg-white p-1 rounded-2xl shadow-sm border border-slate-100 w-full max-w-sm overflow-hidden">
-                <button id="btn-mode-viewer" class="flex-1 px-4 py-3 rounded-xl text-[10px] font-black transition-all">VIEWER</button>
-                <button id="btn-mode-admin" class="flex-1 px-4 py-3 rounded-xl text-[10px] font-black transition-all">ADMIN</button>
+        <!-- モード切替フッター -->
+        <footer class="mt-12 mb-16 text-center">
+            <p class="text-slate-300 text-[9px] font-black uppercase tracking-[0.3em] mb-6 italic">© 2026 HIKITSU ELEMENTARY SCHOOL PTA</p>
+            <div class="inline-flex bg-white p-1 rounded-2xl shadow-sm border border-slate-100 w-full max-w-sm">
+                <button id="btn-nav-viewer" class="flex-1 px-4 py-3 rounded-xl text-[10px] font-black tracking-widest transition-all">VIEWER</button>
+                <button id="btn-nav-admin" class="flex-1 px-4 py-3 rounded-xl text-[10px] font-black tracking-widest transition-all">ADMIN</button>
             </div>
         </footer>
     </div>
 
     <!-- 通知通知 -->
-    <div id="ui-message" class="px-6 py-4 bg-slate-800 text-white rounded-2xl shadow-2xl text-xs font-black border border-slate-600 flex items-center animate-fade-in">
-        <span id="msg-content">通知</span>
+    <div id="toast" class="px-8 py-4 bg-slate-800 text-white rounded-2xl shadow-2xl text-xs font-black border border-slate-600 flex items-center animate-slide-in">
+        <span id="toast-icon" class="mr-3">🔔</span>
+        <span id="toast-content">メッセージ</span>
     </div>
 
     <script type="module">
@@ -149,177 +155,160 @@
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // --- Firebase設定 ---
-        let firebaseConfig = {};
-        try {
-            if (typeof __firebase_config !== 'undefined') firebaseConfig = JSON.parse(__firebase_config);
-        } catch (e) { console.error("Config error", e); }
-        
+        // --- 設定の取得 ---
+        const firebaseConfig = JSON.parse(__firebase_config);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'hikitsu-env-2026';
-        const GOALS = { trucks: 15, cutters: 20 };
         const DOC_PATH = ["artifacts", appId, "public", "data", "statistics", "summary"];
+        const GOALS = { trucks: 15, cutters: 20 };
 
+        // --- Firebase初期化 ---
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // UI要素取得
+        // --- DOM要素のリファレンス ---
+        const el = (id) => document.getElementById(id);
         const ui = {
-            vPeople: document.getElementById('val-people'),
-            vTrucks: document.getElementById('val-trucks'),
-            vCutters: document.getElementById('val-cutters'),
-            tBar: document.getElementById('bar-truck'),
-            cBar: document.getElementById('bar-cutter'),
-            tPct: document.getElementById('txt-truck-pct'),
-            cPct: document.getElementById('txt-cutter-pct'),
-            inP: document.getElementById('in-people'),
-            inT: document.getElementById('in-trucks'),
-            inC: document.getElementById('in-cutters'),
-            btnS: document.getElementById('btn-save'),
-            btnSText: document.getElementById('btn-text'),
-            sTxt: document.getElementById('sync-text'),
-            sIcon: document.getElementById('sync-icon'),
-            msg: document.getElementById('ui-message'),
-            mCon: document.getElementById('msg-content'),
-            badge: document.getElementById('badge'),
-            btnMV: document.getElementById('btn-mode-viewer'),
-            btnMA: document.getElementById('btn-mode-admin')
+            body: document.body,
+            badge: el('badge'),
+            vPeople: el('display-people'),
+            vTrucks: el('display-trucks'),
+            vCutters: el('display-cutters'),
+            tPct: el('txt-truck-pct'),
+            cPct: el('txt-cutter-pct'),
+            tBar: el('bar-truck'),
+            cBar: el('bar-cutter'),
+            inP: el('input-people'),
+            inT: el('input-trucks'),
+            inC: el('input-cutters'),
+            btnSave: el('btn-save'),
+            btnSaveText: el('btn-save-text'),
+            sLabel: el('sync-label'),
+            sDot: el('sync-dot'),
+            toast: el('toast'),
+            tContent: el('toast-content'),
+            btnNavViewer: el('btn-nav-viewer'),
+            btnNavAdmin: el('btn-nav-admin')
         };
 
-        function showMsg(text) {
-            if (!ui.mCon || !ui.msg) return;
-            ui.mCon.innerText = text;
-            ui.msg.style.display = 'flex';
-            setTimeout(() => { if(ui.msg) ui.msg.style.display = 'none'; }, 5000);
+        function showToast(msg, isError = false) {
+            ui.tContent.innerText = msg;
+            ui.toast.style.display = 'flex';
+            ui.toast.style.backgroundColor = isError ? '#ef4444' : '#1e293b';
+            setTimeout(() => { ui.toast.style.display = 'none'; }, 4000);
         }
 
-        // --- モード切替ロジック ---
-        function applyMode() {
-            try {
-                const isAdmin = window.location.hash === '#admin';
-                document.body.classList.toggle('is-admin', isAdmin);
-                
-                if (isAdmin) {
-                    if (ui.badge) {
-                        ui.badge.innerText = "ADMIN MANAGEMENT CONSOLE";
-                        ui.badge.className = "inline-block px-4 py-1 rounded-full bg-slate-800 text-blue-400 text-[10px] font-bold mb-3 tracking-widest uppercase shadow-lg";
-                    }
-                    if (ui.btnMA) ui.btnMA.className = "flex-1 px-4 py-3 rounded-xl text-[10px] font-black bg-slate-900 text-white shadow-md transition-all";
-                    if (ui.btnMV) ui.btnMV.className = "flex-1 px-4 py-3 rounded-xl text-[10px] font-black text-slate-400 transition-all";
-                } else {
-                    if (ui.badge) {
-                        ui.badge.innerText = "LIVE DATA PROCESSING";
-                        ui.badge.className = "inline-block px-4 py-1 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold mb-3 tracking-widest uppercase shadow-sm";
-                    }
-                    if (ui.btnMV) ui.btnMV.className = "flex-1 px-4 py-3 rounded-xl text-[10px] font-black bg-blue-600 text-white shadow-md transition-all";
-                    if (ui.btnMA) ui.btnMA.className = "flex-1 px-4 py-3 rounded-xl text-[10px] font-black text-slate-400 transition-all";
-                }
-            } catch (e) { console.error("applyMode Error", e); }
+        // --- モード切替の核心ロジック ---
+        function setMode(mode) {
+            const isAdmin = mode === 'admin';
+            ui.body.className = isAdmin ? 'mode-admin' : 'mode-viewer';
+            
+            // ボタンのスタイル更新
+            if (isAdmin) {
+                ui.btnNavAdmin.className = "flex-1 px-4 py-3 rounded-xl text-[10px] font-black bg-slate-900 text-white shadow-md";
+                ui.btnNavViewer.className = "flex-1 px-4 py-3 rounded-xl text-[10px] font-black text-slate-400";
+                ui.badge.innerText = "ADMIN MANAGEMENT CONSOLE";
+                ui.badge.className = "inline-block px-4 py-1 rounded-full bg-slate-800 text-blue-400 text-[10px] font-bold mb-3 tracking-widest uppercase shadow-lg";
+            } else {
+                ui.btnNavViewer.className = "flex-1 px-4 py-3 rounded-xl text-[10px] font-black bg-blue-600 text-white shadow-md";
+                ui.btnNavAdmin.className = "flex-1 px-4 py-3 rounded-xl text-[10px] font-black text-slate-400";
+                ui.badge.innerText = "LIVE DATA PROCESSING";
+                ui.badge.className = "inline-block px-4 py-1 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold mb-3 tracking-widest uppercase shadow-sm";
+            }
         }
 
-        // ボタンへのイベント登録
-        if (ui.btnMV) ui.btnMV.addEventListener('click', () => {
-            window.location.hash = '';
-            history.replaceState(null, null, ' ');
-            applyMode();
-        });
-        
-        if (ui.btnMA) ui.btnMA.addEventListener('click', () => {
-            window.location.hash = 'admin';
-            applyMode();
-        });
+        ui.btnNavAdmin.onclick = () => { window.location.hash = 'admin'; setMode('admin'); };
+        ui.btnNavViewer.onclick = () => { window.location.hash = ''; history.replaceState(null, null, ' '); setMode('viewer'); };
 
-        window.addEventListener('hashchange', applyMode);
-        applyMode();
+        // 読み込み時とハッシュ変更時の検知
+        window.onhashchange = () => setMode(window.location.hash === '#admin' ? 'admin' : 'viewer');
+        setMode(window.location.hash === '#admin' ? 'admin' : 'viewer');
 
-        // --- セッション & 同期 ---
-        const startSession = async () => {
+        // --- Firebase接続とデータ同期 ---
+        const connect = async () => {
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
+                if (!auth.currentUser) {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
                 }
-            } catch (e) { console.error("Auth init error", e); }
+            } catch (err) { console.error("Auth Fail", err); }
         };
 
         onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                if (ui.sTxt) ui.sTxt.innerText = "CONNECTING...";
-                return;
-            }
-            
-            if (ui.sTxt) ui.sTxt.innerText = "CLOUD CONNECTED";
-            if (ui.sIcon) ui.sIcon.className = "w-1.5 h-1.5 bg-green-500 rounded-full mr-2 animate-pulse";
+            if (!user) return;
+            ui.sLabel.innerText = "CLOUD CONNECTED";
+            ui.sDot.className = "w-1.5 h-1.5 bg-green-500 rounded-full mr-2 animate-pulse";
 
+            // データの監視
             onSnapshot(doc(db, ...DOC_PATH), (snap) => {
                 if (snap.exists()) {
                     const data = snap.data();
-                    renderData(data);
+                    const p = data.people || 0;
+                    const t = data.trucks || 0;
+                    const c = data.cutters || 0;
+
+                    // 数値の表示を更新
+                    ui.vPeople.innerText = p.toLocaleString();
+                    ui.vTrucks.innerText = t.toLocaleString();
+                    ui.vCutters.innerText = c.toLocaleString();
+
+                    // バーと%の更新
+                    const tR = Math.min(Math.round((t / GOALS.trucks) * 100), 100);
+                    const cR = Math.min(Math.round((c / GOALS.cutters) * 100), 100);
+                    ui.tPct.innerText = tR + '%';
+                    ui.cPct.innerText = cR + '%';
+                    ui.tBar.style.width = tR + '%';
+                    ui.cBar.style.width = cR + '%';
+
+                    // 管理画面の入力欄を同期（編集中でない時だけ）
                     if (document.activeElement.tagName !== 'INPUT') {
-                        if (ui.inP) ui.inP.value = data.people || 0;
-                        if (ui.inT) ui.inT.value = data.trucks || 0;
-                        if (ui.inC) ui.inC.value = data.cutters || 0;
+                        ui.inP.value = p; ui.inT.value = t; ui.inC.value = c;
                     }
                 }
-            }, (err) => {
-                console.error("Sync error", err);
-                showMsg("同期エラー: 通信環境を確認してください。");
-            });
+            }, (err) => showToast("同期エラーが発生しました", true));
         });
 
-        function renderData(data) {
-            const p = data.people || 0;
-            const t = data.trucks || 0;
-            const c = data.cutters || 0;
-            if (ui.vPeople) ui.vPeople.innerText = p.toLocaleString();
-            if (ui.vTrucks) ui.vTrucks.innerText = t.toLocaleString();
-            if (ui.vCutters) ui.vCutters.innerText = c.toLocaleString();
-            const tR = Math.min(Math.round((t / GOALS.trucks) * 100), 100);
-            const cR = Math.min(Math.round((c / GOALS.cutters) * 100), 100);
-            if (ui.tPct) ui.tPct.innerText = tR + '%';
-            if (ui.cPct) ui.cPct.innerText = cR + '%';
-            if (ui.tBar) ui.tBar.style.width = tR + '%';
-            if (ui.cBar) ui.cBar.style.width = cR + '%';
-        }
+        // --- 保存処理の実行 ---
+        ui.btnSave.onclick = async () => {
+            if (!auth.currentUser) {
+                ui.btnSaveText.innerText = "再接続中...";
+                await connect();
+                if (!auth.currentUser) { showToast("接続に失敗しました", true); return; }
+            }
 
-        // --- 保存処理 ---
-        if (ui.btnS) {
-            ui.btnS.addEventListener('click', async () => {
-                if (!auth.currentUser) {
-                    showMsg("接続を確立しています。数秒後にお試しください。");
-                    startSession();
-                    return;
-                }
+            ui.btnSave.disabled = true;
+            ui.btnSaveText.innerText = "クラウドへ送信中...";
+
+            try {
+                const payload = {
+                    people: parseInt(ui.inP.value) || 0,
+                    trucks: parseInt(ui.inT.value) || 0,
+                    cutters: parseInt(ui.inC.value) || 0,
+                    updatedAt: new Date()
+                };
+
+                await setDoc(doc(db, ...DOC_PATH), payload, { merge: true });
                 
-                ui.btnS.disabled = true;
-                const originalText = ui.btnSText ? ui.btnSText.innerText : "保存";
-                if (ui.btnSText) ui.btnSText.innerText = "送信中...";
+                ui.btnSaveText.innerText = "反映が完了しました！";
+                showToast("クラウド上のデータを更新しました");
+                
+                setTimeout(() => {
+                    ui.btnSaveText.innerText = "クラウドへデータを反映する";
+                    ui.btnSave.disabled = false;
+                }, 2000);
+            } catch (err) {
+                console.error(err);
+                showMsg("エラー: " + err.message, true);
+                ui.btnSave.disabled = false;
+                ui.btnSaveText.innerText = "クラウドへデータを反映する";
+            }
+        };
 
-                try {
-                    const data = {
-                        people: parseInt(ui.inP.value) || 0,
-                        trucks: parseInt(ui.inT.value) || 0,
-                        cutters: parseInt(ui.inC.value) || 0,
-                        updatedAt: new Date()
-                    };
-                    await setDoc(doc(db, ...DOC_PATH), data, { merge: true });
-                    if (ui.btnSText) ui.btnSText.innerText = "反映完了！";
-                    showMsg("データをクラウドへ反映しました。");
-                    setTimeout(() => {
-                        if (ui.btnSText) ui.btnSText.innerText = originalText;
-                        ui.btnS.disabled = false;
-                    }, 2000);
-                } catch (err) {
-                    console.error("Save error", err);
-                    showMsg("保存に失敗しました: " + err.message);
-                    if (ui.btnSText) ui.btnSText.innerText = originalText;
-                    ui.btnS.disabled = false;
-                }
-            });
-        }
-
-        startSession();
+        // 初期接続の開始
+        connect();
     </script>
 </body>
 </html>
