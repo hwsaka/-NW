@@ -18,7 +18,7 @@
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-
+ 
 header { background: var(--navy); position: relative; overflow: hidden; }
 header::after {
   content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 4px;
@@ -33,7 +33,7 @@ header::after {
 h1 { font-weight: 900; font-size: clamp(1.6rem, 5vw, 2.8rem); color: #fff; line-height: 1.2; }
 h1 em { color: var(--gold); font-style: normal; }
 .header-sub { margin-top: .6rem; font-size: .84rem; color: #93a3c0; }
-
+ 
 .speed-badge {
   display: inline-flex; align-items: center; gap: .4rem;
   background: var(--orange); color: #fff;
@@ -42,7 +42,7 @@ h1 em { color: var(--gold); font-style: normal; }
 }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 .pulse { width: 7px; height: 7px; border-radius: 50%; background: #fff; animation: blink 1.6s infinite; }
-
+ 
 .fetch-bar {
   background: rgba(255,255,255,.07); border-top: 1px solid rgba(255,255,255,.08);
   padding: .5rem 1.5rem; font-size: .7rem; color: rgba(255,255,255,.5);
@@ -50,9 +50,9 @@ h1 em { color: var(--gold); font-style: normal; }
 }
 .fetch-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); }
 .fetch-dot.spin { animation: blink .5s infinite; }
-
+ 
 main { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
-
+ 
 .date-strip {
   background: var(--navy); color: #fff; border-radius: 6px;
   padding: .75rem 1.25rem; display: flex; align-items: center;
@@ -60,19 +60,19 @@ main { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
 }
 .date-strip strong { font-weight: 900; font-size: 1rem; }
 .date-strip .sep { opacity: .3; }
-
+ 
 .section-label {
   font-size: .68rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
   color: var(--muted); margin-bottom: 1rem; display: flex; align-items: center; gap: .6rem;
 }
 .section-label::after { content: ''; flex: 1; height: 1px; background: #ddd; }
-
+ 
 .stat-grid {
   display: grid; grid-template-columns: repeat(2, 1fr);
   gap: 1rem; margin-bottom: .75rem;
 }
 @media (min-width: 580px) { .stat-grid { grid-template-columns: repeat(4, 1fr); } }
-
+ 
 .stat-card {
   background: var(--card); border-radius: 8px; border: 1.5px solid #e5e7eb;
   padding: 1.25rem 1rem 1rem; text-align: center;
@@ -83,10 +83,10 @@ main { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
 .c-navy::before   { background: var(--navy); }
 .c-orange::before { background: var(--orange); }
 .c-gold::before   { background: var(--gold); }
-
+ 
 @keyframes flash-border { 0%{border-color:#e5e7eb} 30%{border-color:var(--teal)} 100%{border-color:#e5e7eb} }
 .stat-card.updated { animation: flash-border .8s ease; }
-
+ 
 .stat-icon { font-size: 1.4rem; margin-bottom: .25rem; }
 .stat-name { font-size: .67rem; font-weight: 700; color: var(--muted); line-height: 1.5; margin-bottom: .5rem; min-height: 2em; }
 .stat-num {
@@ -97,71 +97,67 @@ main { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
 .stat-num.pop { animation: pop .35s ease; }
 .stat-unit { font-size: .78rem; font-weight: 700; color: var(--muted); margin-left: .1rem; }
 .stat-target { font-size: .62rem; color: #bbb; margin-top: .4rem; }
-
+ 
 .c-teal   .stat-num { color: var(--teal); }
 .c-navy   .stat-num { color: var(--navy); }
 .c-orange .stat-num { color: var(--orange); }
 .c-gold   .stat-num { color: var(--gold); }
-
+ 
 .prog-wrap { background: #f0f0f0; border-radius: 99px; height: 5px; margin-top: .6rem; overflow: hidden; }
 .prog-bar  { height: 100%; border-radius: 99px; width: 0; transition: width .9s ease; }
 .c-teal   .prog-bar { background: var(--teal); }
 .c-navy   .prog-bar { background: var(--navy); }
 .c-orange .prog-bar { background: var(--orange); }
 .c-gold   .prog-bar { background: var(--gold); }
-
+ 
 .updated-bar { text-align: right; font-size: .72rem; color: var(--muted); margin-bottom: 2rem; margin-top: .4rem; }
-
+ 
 .error-bar {
   background: #fff3cd; border: 1px solid #f0c040; border-radius: 6px;
   padding: .7rem 1rem; font-size: .8rem; color: #7a5a00;
   margin-bottom: 1.5rem; display: none;
 }
-
+ 
 .msg-wrap { margin-bottom: 2.5rem; }
 .msg-card {
   background: #e8f8f5; border: 1px solid #b2e4d8; border-radius: 8px;
   padding: 1.2rem 1.5rem; font-size: .9rem; line-height: 1.9;
   color: #1a4a3f; white-space: pre-wrap;
 }
-
+ 
 /* エリア配置図 */
 .area-map-wrap {
   background: var(--card); border-radius: 8px; border: 1.5px solid #e5e7eb;
   overflow: hidden; margin-bottom: 1.25rem;
 }
 .area-map-wrap img { width: 100%; display: block; }
-
+ 
 /* 作業内容カード */
 .work-cards { display: grid; grid-template-columns: 1fr; gap: .75rem; margin-bottom: 2rem; }
 @media (min-width: 580px) { .work-cards { grid-template-columns: 1fr 1fr; } }
-
+ 
 .work-card {
   border-radius: 8px; padding: 1rem 1.2rem;
   border-left: 5px solid;
 }
-.work-card.yellow { background: #fefce8; border-color: #eab308; }
-.work-card.green  { background: #f0fdf4; border-color: #22c55e; }
-.work-card.purple { background: #faf5ff; border-color: #a855f7; }
-.work-card.blue   { background: #eff6ff; border-color: #3b82f6; }
-
+.work-card.yellow  { background: #fefce8; border-color: #eab308; }
+.work-card.green   { background: #f0fdf4; border-color: #22c55e; }
+.work-card.red     { background: #fff1f2; border-color: #ef4444; }
+.work-card.orange  { background: #fff7ed; border-color: #f97316; }
+.work-card.purple  { background: #faf5ff; border-color: #a855f7; }
+.work-card.blue    { background: #eff6ff; border-color: #3b82f6; }
+.work-card.full    { grid-column: 1 / -1; }
+ 
 .work-card-header {
   display: flex; align-items: center; gap: .5rem;
   font-weight: 900; font-size: .95rem; margin-bottom: .5rem;
 }
-.work-card-badge {
-  display: inline-block; width: 22px; height: 22px; border-radius: 50%;
-  font-size: .7rem; font-weight: 900; color: #fff;
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+.work-dot {
+  width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
 }
-.yellow .work-card-badge { background: #eab308; }
-.green  .work-card-badge { background: #22c55e; }
-.purple .work-card-badge { background: #a855f7; }
-.blue   .work-card-badge { background: #3b82f6; }
-
 .work-card p { font-size: .82rem; line-height: 1.8; color: #374151; }
 .work-card strong { font-weight: 700; }
-
+ 
 /* 注意書き */
 .notice-card {
   background: #f8fafc; border: 1px solid #e2e8f0;
@@ -170,13 +166,13 @@ main { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
   font-size: .82rem; line-height: 1.9; color: var(--muted);
 }
 .notice-card strong { color: var(--navy); display: block; margin-bottom: .4rem; font-size: .85rem; }
-
+ 
 .contact-block { font-size: .82rem; color: var(--muted); line-height: 2; margin-bottom: 3rem; }
 footer { text-align: center; font-size: .7rem; color: #bbb; padding: 2rem 1.5rem; border-top: 1px solid #ddd; }
 </style>
 </head>
 <body>
-
+ 
 <header>
   <div class="header-inner">
     <div class="eyebrow">令和8年度 引津小学校 伝統行事</div>
@@ -189,18 +185,18 @@ footer { text-align: center; font-size: .7rem; color: #bbb; padding: 2rem 1.5rem
     <span id="fetch-status">データを読み込み中...</span>
   </div>
 </header>
-
+ 
 <main>
   <div class="date-strip">
     <strong>5月23日（土）</strong>
     <span class="sep">|</span><span>8:00〜10:00　集合 7:45</span>
     <span class="sep">|</span><span>予備日：5月30日（土）</span>
   </div>
-
+ 
   <div class="error-bar" id="error-bar">
     ⚠️ データの取得に失敗しました。しばらくすると自動で再試行します。
   </div>
-
+ 
   <!-- 参加・機材集計 -->
   <div class="section-label">参加・機材 集計</div>
   <div class="stat-grid">
@@ -233,66 +229,93 @@ footer { text-align: center; font-size: .7rem; color: #bbb; padding: 2rem 1.5rem
       <div class="stat-target">目標：15台規模</div>
     </div>
   </div>
-
+ 
   <div class="updated-bar">最終更新：<span id="updated-at">取得中...</span></div>
-
+ 
   <div class="msg-wrap" id="msg-wrap" style="display:none">
     <div class="section-label">事務局コメント</div>
     <div class="msg-card" id="msg-display"></div>
   </div>
-
+ 
   <!-- エリア配置図 -->
   <div class="section-label">作業エリア配置図</div>
   <div class="area-map-wrap">
     <img src="annotated_map.png" alt="作業エリア配置図">
   </div>
-
+ 
   <!-- 作業内容カード -->
   <div class="work-cards">
+ 
     <div class="work-card yellow">
       <div class="work-card-header">
-        <div class="work-card-badge">①</div>
-        <span>黄エリア　刈払機・軽トラ担当</span>
+        <div class="work-dot" style="background:#eab308;"></div>
+        <span>エリア①（黄）刈払機担当</span>
       </div>
       <p>
-        <strong>刈払機担当：</strong>トラクターが入れない植え込み周辺・柵際・境界線際などを先行実施。<br>
-        <strong>軽トラ担当：</strong>①②③エリアをピストン輸送で集草・搬出。
+        トラクターが入れない<strong>植え込み周辺・柵際・境界線際</strong>を先行実施。<br>
+        刈り取った草は軽トラ・ダンプが回収します。
       </p>
     </div>
+ 
     <div class="work-card green">
       <div class="work-card-header">
-        <div class="work-card-badge">②</div>
-        <span>緑エリア　刈払機・軽トラ担当</span>
+        <div class="work-dot" style="background:#22c55e;"></div>
+        <span>エリア②（緑）刈払機担当</span>
       </div>
       <p>
-        <strong>刈払機担当：</strong>トラクターが入れない植え込み周辺・柵際・境界線際などを先行実施。<br>
-        <strong>軽トラ担当：</strong>①②③エリアをピストン輸送で集草・搬出。
+        トラクターが入れない<strong>植え込み周辺・柵際・境界線際</strong>を先行実施。<br>
+        刈り取った草は軽トラ・ダンプが回収します。
       </p>
     </div>
+ 
+    <div class="work-card red">
+      <div class="work-card-header">
+        <div class="work-dot" style="background:#ef4444;"></div>
+        <span>赤エリア　3tダンプ メイン集草</span>
+      </div>
+      <p>
+        <strong>3tダンプカーがメインで集草</strong>を担当するエリアです。<br>
+        刈払機部隊が先行した後、広範囲の草を効率よく回収・搬出します。
+      </p>
+    </div>
+ 
+    <div class="work-card orange">
+      <div class="work-card-header">
+        <div class="work-dot" style="background:#f97316; border: 2px solid #fff; box-shadow: 0 0 0 2px #f97316;border-radius:50%;"></div>
+        <span>🟠 軽トラ　配車ポイントで集草</span>
+      </div>
+      <p>
+        地図上の<strong>オレンジ丸の位置に配車</strong>して集草・積込を担当。<br>
+        刈り取った草を<strong>青エリア（草捨て場）までピストン輸送</strong>してください。
+      </p>
+    </div>
+ 
     <div class="work-card purple">
       <div class="work-card-header">
-        <div class="work-card-badge">③</div>
-        <span>紫エリア　手鎌・親子レク担当</span>
+        <div class="work-dot" style="background:#a855f7;"></div>
+        <span>紫エリア　手鎌・自走式草刈機担当</span>
       </div>
       <p>
-        <strong>手鎌担当：</strong>機械が入れない場所を中心に作業。<br>
-        <strong>中庭エリア：</strong>親子参加の方を中心に手作業で丁寧に仕上げます。
+        <strong>🌟 水崎勝則さんの自走式草刈機</strong>で広範囲を先行実施。<br>
+        植え込み付近・細かな箇所は<strong>手鎌部隊</strong>が丁寧に仕上げ。<br>
+        中庭エリアは<strong>親子参加の方を中心</strong>に手作業で担当します。
       </p>
     </div>
+ 
     <div class="work-card blue">
       <div class="work-card-header">
-        <div class="work-card-badge">🚜</div>
-        <span>トラクター　広域平面担当</span>
+        <div class="work-dot" style="background:#3b82f6;"></div>
+        <span>青エリア　草捨て場（搬出先）</span>
       </div>
       <p>
-        <strong>担当エリア：</strong>①・②の広域平面エリアを走行し、広範囲を迅速に処理。<br>
-        刈払機部隊の先行作業と連携して効率よく進めます。
+        軽トラ・3tダンプの<strong>草の搬出先（草捨て場）</strong>です。<br>
+        ピストン輸送でどんどん運び込んでください。
       </p>
     </div>
-    <div class="work-card" style="background:#fff7ed;border-color:#f97316;grid-column:1/-1;">
+ 
+    <div class="work-card full" style="background:#fff7ed;border:1.5px solid #f97316;border-left:5px solid #f97316;border-radius:8px;padding:1rem 1.2rem;">
       <div class="work-card-header">
-        <div class="work-card-badge" style="background:#f97316;">💪</div>
-        <span>機械なしのお父様！　集草・積込担当</span>
+        <span>💪 機械なしのお父様！　集草・積込担当</span>
       </div>
       <p>
         刈払機や重機がなくても大丈夫！<br>
@@ -300,9 +323,10 @@ footer { text-align: center; font-size: .7rem; color: #bbb; padding: 2rem 1.5rem
         体力勝負のこの役割、皆さんのパワーが作業効率を大きく左右します。ぜひ積極的にご参加ください💪
       </p>
     </div>
+ 
   </div>
-
-  <!-- 保護者向け注意書き -->
+ 
+  <!-- 注意書き -->
   <div class="notice-card">
     <strong>📢 このページは保護者の方向けです</strong>
     このページはGoogleのデータ配信サービス（Google Apps Script）を利用して集計データを表示しています。<br>
@@ -312,29 +336,28 @@ footer { text-align: center; font-size: .7rem; color: #bbb; padding: 2rem 1.5rem
     ・学校が管理するアカウントでログイン中の端末<br><br>
     その場合は、<strong style="color:var(--navy)">保護者の方のスマートフォンやPCでご覧ください。</strong>
   </div>
-
+ 
   <div class="section-label">お問い合わせ</div>
   <div class="contact-block">
     引津小学校 大規模環境美化作業 実行委員会（あおぞら会準備事務局）<br>
     事務局：引津小学校 教頭 / ☎ 092-328-2207
   </div>
 </main>
-
+ 
 <footer>&copy; 2026 HIKITSU ELEMENTARY SCHOOL PTA. ALL RIGHTS RESERVED.</footer>
-
+ 
 <script>
 var API_URL = 'https://script.google.com/macros/s/AKfycbxaVBznTKXdKMkjCaremPjNuI10lpSgUJIbZhTZdJabnw-tO3RjJNt8cEFNh11mZ6eKXw/exec';
-
 var TARGETS     = { day23: 130, day30: 130, cutters: 20, trucks: 15 };
 var INTERVAL_MS = 30000;
-
+ 
 var dotEl     = document.getElementById('fetch-dot');
 var statusEl  = document.getElementById('fetch-status');
 var errorEl   = document.getElementById('error-bar');
 var updatedEl = document.getElementById('updated-at');
 var msgWrapEl = document.getElementById('msg-wrap');
 var msgDispEl = document.getElementById('msg-display');
-
+ 
 function fetchData() {
   dotEl.classList.add('spin');
   var cbName = '_cb' + Date.now();
@@ -348,19 +371,19 @@ function fetchData() {
   script.onerror = function() { clearTimeout(timer); cleanup(cbName); showError(); };
   document.head.appendChild(script);
 }
-
+ 
 function cleanup(cbName) {
   dotEl.classList.remove('spin');
   delete window[cbName];
   var old = document.head.querySelector('script[src*="' + cbName + '"]');
   if (old) document.head.removeChild(old);
 }
-
+ 
 function showError() {
   errorEl.style.display = 'block';
   statusEl.textContent  = '取得失敗 — 再試行中...';
 }
-
+ 
 function renderData(d) {
   setCard('23',     d.day23,   TARGETS.day23);
   setCard('30',     d.day30,   TARGETS.day30);
@@ -380,7 +403,7 @@ function renderData(d) {
     msgWrapEl.style.display = 'none';
   }
 }
-
+ 
 function setCard(key, val, target) {
   var numEl  = document.getElementById('num-'  + key);
   var progEl = document.getElementById('prog-' + key);
@@ -399,11 +422,12 @@ function setCard(key, val, target) {
     progEl.style.width = Math.min(Math.round(val / target * 100), 100) + '%';
   }
 }
-
+ 
 function pad(n) { return n < 10 ? '0' + n : String(n); }
-
+ 
 fetchData();
 setInterval(fetchData, INTERVAL_MS);
 </script>
 </body>
 </html>
+ 
