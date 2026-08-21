@@ -1,1 +1,1 @@
-# -NW
+#kusakari_kekka2026
